@@ -44,6 +44,7 @@ public class DGraph implements graph
 	public void addNode(node_data n) 
 	{
 			this.vertices.put( n.getKey(),n);
+			mc++;
 	}
 
 	@Override
@@ -65,15 +66,9 @@ public class DGraph implements graph
 				}
 				edge_data temp=new edgeData(src,dest,w,null,0);
 				this.edges.get(src).put(dest, temp);
+				mc++;
 			}
-//			else
-//				throw new RuntimeException ("ERR, one of the vertices not exist");
-//			
 		}
-//		else
-//			throw new RuntimeException ("ERR, the vertices must be diffrent");
-
-		
 	}
 
 	@Override
@@ -85,7 +80,11 @@ public class DGraph implements graph
 	@Override
 	public Collection<edge_data> getE(int node_id) 
 	{
-		return this.edges.get(node_id).values();
+		if(edges.containsKey(node_id))
+		{
+			return this.edges.get(node_id).values();
+		}
+		return null;
 	}
 
 	@Override
@@ -101,13 +100,16 @@ public class DGraph implements graph
 				{
 					edges.get(keyTemp).remove(key);
 					count--;
+					mc++;
 				}
 				if(keyTemp==key&&edges.containsKey(key))
 				{
+					mc=mc+edges.get(key).size();
 					count=count-edges.get(key).size();
 					edges.remove(key);
 				}
 			}
+			mc++;
 			return vertices.remove(key);
 		}
 		return null;
@@ -121,6 +123,7 @@ public class DGraph implements graph
 		{
 			if(edges.containsKey(src)&&edges.get(src).containsKey(dest))
 			{
+				mc++;
 				count--;
 				return edges.get(src).remove(dest);
 			}
@@ -130,7 +133,6 @@ public class DGraph implements graph
 		else
 			return null;
 	}
-
 	@Override
 	public int nodeSize() 
 	{
@@ -148,5 +150,4 @@ public class DGraph implements graph
 	{
 		return mc;
 	}
-
 }
