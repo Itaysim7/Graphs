@@ -9,11 +9,14 @@ public class DGraph implements graph
     HashMap<Integer,node_data> vertices; 
     HashMap<Integer, HashMap<Integer,edge_data> > edges; //integer is the vertices and the arraylist save his edge
     int count;
+    int mc;
 
     public DGraph() 
 	{
     	vertices=new HashMap<Integer,node_data>();
     	edges=new HashMap<Integer, HashMap<Integer,edge_data> > ();
+    	this.count=0;
+    	this.mc=0;
 	}
 	@Override
 	public node_data getNode(int key)
@@ -40,21 +43,37 @@ public class DGraph implements graph
 	@Override
 	public void addNode(node_data n) 
 	{
-		this.vertices.put( n.getKey(),n);
+			this.vertices.put( n.getKey(),n);
 	}
 
 	@Override
 	public void connect(int src, int dest, double w)
 	{
-		if(!edges.containsKey(src))
+		if(src!=dest&&w>=0)//check if the edge is between different vertices and the weight is positive 
 		{
-			HashMap<Integer, edge_data> edgesVer=new HashMap<Integer,edge_data> ();
-			edges.put(src, edgesVer);
+			if(vertices.containsKey(src)&&vertices.containsKey(dest))//check if there is vertices src dest
+			{
+				if(!edges.containsKey(src)) //check if there is a hashmap for key src
+				{
+					HashMap<Integer, edge_data> edgesVer=new HashMap<Integer,edge_data> ();
+					edges.put(src, edgesVer);
+				}
+				if(!edges.get(src).containsKey(dest))//check if the edge is already exist
+				{
+					count++;
+					edges.get(src).remove(dest);
+				}
+				edge_data temp=new edgeData(src,dest,w,null,0);
+				this.edges.get(src).put(dest, temp);
+			}
+//			else
+//				throw new RuntimeException ("ERR, one of the vertices not exist");
+//			
 		}
-		if(!edges.get(src).containsKey(dest))
-			count++;
-		edge_data temp=new edgeData(src,dest,w,null,0);
-		this.edges.get(src).put(dest, temp);
+//		else
+//			throw new RuntimeException ("ERR, the vertices must be diffrent");
+
+		
 	}
 
 	@Override
@@ -72,33 +91,43 @@ public class DGraph implements graph
 	@Override
 	public node_data removeNode(int key) 
 	{
-		int keyTemp;
-		for (Entry<Integer, HashMap<Integer, edge_data>> entry : edges.entrySet())
+		if(vertices.containsKey(key)) //check if there is such vertex
 		{
-			keyTemp=entry.getKey();
-			if(keyTemp!=key&&edges.get(keyTemp).containsKey(key))
+			int keyTemp;
+			for (Entry<Integer, node_data> entry : vertices.entrySet())
 			{
-				edges.get(keyTemp).remove(key);
-				count--;
+				keyTemp=entry.getKey();
+				if(keyTemp!=key&&edges.containsKey(keyTemp) &&edges.get(keyTemp).containsKey(key))
+				{
+					edges.get(keyTemp).remove(key);
+					count--;
+				}
+				if(keyTemp==key&&edges.containsKey(key))
+				{
+					count=count-edges.get(key).size();
+					edges.remove(key);
+				}
 			}
-			if(keyTemp==key)
-			{
-				count=count-edges.get(key).size();
-				edges.remove(key);
-			}
+			return vertices.remove(key);
 		}
-		return vertices.remove(key);
+		return null;
+		
 	}
 
 	@Override
 	public edge_data removeEdge(int src, int dest) 
 	{
-		if(edges.get(src).containsKey(dest))
+		if(vertices.containsKey(src)&&vertices.containsKey(dest))
 		{
-			count--;
-			return edges.get(src).remove(dest);
+			if(edges.containsKey(src)&&edges.get(src).containsKey(dest))
+			{
+				count--;
+				return edges.get(src).remove(dest);
+			}
+			else 
+				return null;
 		}
-		else 
+		else
 			return null;
 	}
 
@@ -115,9 +144,9 @@ public class DGraph implements graph
 	}
 
 	@Override
-	public int getMC() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getMC() 
+	{
+		return mc;
 	}
 
 }

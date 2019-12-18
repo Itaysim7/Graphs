@@ -4,7 +4,7 @@ import utils.Point3D;
 
 public class nodeData implements node_data
 {
-	private static int nextID = 1;
+	private static int nextID = 0;
 	private Point3D location;
 	private int key;
 	private double weight;
