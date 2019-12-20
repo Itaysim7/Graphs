@@ -80,11 +80,11 @@ public class DGraph implements graph
 	@Override
 	public Collection<edge_data> getE(int node_id) 
 	{
-		if(edges.containsKey(node_id))
-		{
+//		if(edges.containsKey(node_id))
+//		{
 			return this.edges.get(node_id).values();
-		}
-		return null;
+//		}
+//		return null;
 	}
 
 	@Override
