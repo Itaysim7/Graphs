@@ -70,23 +70,42 @@ public class test {
 //		System.out.println(al.isPath(0,3));
 		
 		//check isConnected
+//		graph g=new DGraph();
+//		for(int i=0;i<4;i++)
+//		{
+//			Point3D p=new Point3D(i,i,i);
+//			node_data a=new nodeData(p,i,null,0);
+//			g.addNode(a);
+//		}
+//		g.connect(0, 1, 0);
+//		g.connect(1, 0, 0);
+//		g.connect(3,1, 0);
+//		g.connect(1,3, 0);
+//		g.connect(3,2, 0);
+//		g.connect(2, 1, 0);
+//		Graph_Algo al=new Graph_Algo();
+//		al.init(g);
+//		System.out.println(al.isConnected());
+		
+		//check shortestPath	
 		graph g=new DGraph();
-		for(int i=0;i<4;i++)
+		for(int i=0;i<5;i++)
 		{
 			Point3D p=new Point3D(i,i,i);
-			node_data a=new nodeData(p,i,null,0);
+			node_data a=new nodeData(p,0,null,0);
 			g.addNode(a);
 		}
-		g.connect(0, 1, 0);
-		g.connect(1, 0, 0);
-		g.connect(3,1, 0);
-		g.connect(1,3, 0);
-
-		g.connect(3,2, 0);
-		g.connect(2, 1, 0);
+		g.connect(0,1,2);
+		g.connect(1,0,2);
+		g.connect(0,3,12);
+		g.connect(1,2,7);
+		g.connect(1,4,5);
+		g.connect(2,4,1);
+		g.connect(4,3,3);
+		g.connect(2,3,3);
 		Graph_Algo al=new Graph_Algo();
 		al.init(g);
-		System.out.println(al.isConnected());
+		al.shortestPath(0,3);
 
 
 

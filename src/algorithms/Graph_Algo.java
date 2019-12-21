@@ -1,5 +1,7 @@
 package algorithms;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -64,14 +66,87 @@ public class Graph_Algo implements graph_algorithms
 	}
 
 	@Override
-	public double shortestPathDist(int src, int dest) {
-		// TODO Auto-generated method stub
-		return 0;
+	public double shortestPathDist(int src, int dest) 
+	{
+		this.weigthInfi();//set all the weight vertices to infinity
+		this.resetInfo();// set all "father" vertices to null
+		g.getNode(src).setWeight(0);
+		g.getNode(src).setTag(1);
+		
+		try 
+		{
+			for(Iterator<edge_data> edgeIter=g.getE(src).iterator();edgeIter.hasNext();)
+			{
+				edge_data e=edgeIter.next();
+				if(g.getNode(e.getDest()).getWeight()>g.getNode(src).getWeight()+e.getWeight())
+				{
+					g.getNode(e.getDest()).setWeight(g.getNode(src).getWeight()+e.getWeight());
+					g.getNode(e.getDest()).setInfo(""+src);
+				}
+			}
+			
+		}
+		catch(NullPointerException e)//if there is not a path
+		{
+			return Integer.MAX_VALUE;
+		}		
+		ArrayList<node_data> ver=new ArrayList<node_data>();
+		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
+		{ //insert all the vertices to array list
+			node_data v=verIter.next();
+			if(v.getKey()!=src)
+			{
+				ver.add(v);
+			}
+		}
+		while(ver.size()!=0)
+		{
+			int minVer=findMinVer(ver);//find the vertex with the minimum weight and delete it from the array
+			g.getNode(minVer).setTag(1);
+			try 
+			{
+				for(Iterator<edge_data> edgeIter=g.getE(minVer).iterator();edgeIter.hasNext();)
+				{
+					edge_data e=edgeIter.next();
+					if(g.getNode(e.getDest()).getTag()==0&&g.getNode(e.getDest()).getWeight()>g.getNode(minVer).getWeight()+e.getWeight())
+					{
+						g.getNode(e.getDest()).setWeight(g.getNode(minVer).getWeight()+e.getWeight());
+						g.getNode(e.getDest()).setInfo(""+minVer);
+					}
+				}	
+			}
+			catch(NullPointerException e)
+			{}
+		}
+		this.resetTag();
+		return g.getNode(dest).getWeight();
 	}
 
 	@Override
-	public List<node_data> shortestPath(int src, int dest) {
-		// TODO Auto-generated method stub
+	public List<node_data> shortestPath(int src, int dest) 
+	{
+		List <node_data> path=new ArrayList <node_data>();
+		double dis=this.shortestPathDist(src,dest);
+		if(dis<Integer.MAX_VALUE)//if there is a path
+		{
+			node_data v=g.getNode(dest);
+			path.add(v);
+			while(!v.getInfo().isEmpty())
+			{
+				int father=Integer.parseInt(v.getInfo());
+				path.add(g.getNode(father));
+				v=g.getNode(father);
+			}
+			List <node_data> OPath=new ArrayList <node_data>();
+			for(int i=path.size()-1;i>=0;i--)
+			{
+				OPath.add(path.get(i));
+			}
+			for(int i=0;i<OPath.size();i++)
+			{
+				System.out.println(OPath.get(i).getKey());
+			}
+		}
 		return null;
 	}
 
@@ -84,7 +159,6 @@ public class Graph_Algo implements graph_algorithms
 	@Override
 	public graph copy() 
 	{
-		
 		graph copy=new DGraph();		
 		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
 		{
@@ -116,7 +190,28 @@ public class Graph_Algo implements graph_algorithms
 	{
 		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
 		{
-			verIter.next().setTag(0);;
+			verIter.next().setTag(0);
+		}
+	}
+	private void weigthInfi()
+	{
+		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
+		{
+			verIter.next().setWeight(Integer.MAX_VALUE);
+		}
+	}
+	private void resetWeigth()
+	{
+		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
+		{
+			verIter.next().setWeight(0);
+		}
+	}
+	private void resetInfo()
+	{
+		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
+		{
+			verIter.next().setInfo("");
 		}
 	}
 	private int countReachableVer(int key)
@@ -172,6 +267,23 @@ public class Graph_Algo implements graph_algorithms
 		{
 			return false;
 		}
+	}
+	private int findMinVer(ArrayList <node_data> ver)
+	{
+		double weigth=Integer.MAX_VALUE;
+		int minVer=0;
+		int index=0;
+		for(int i=0;i<ver.size();i++)
+		{
+			if(ver.get(i).getWeight()<weigth)
+			{
+				weigth=ver.get(i).getWeight();
+				minVer=ver.get(i).getKey();
+				index=i;
+			}
+		}
+		ver.remove(index);
+		return minVer;
 	}
 
 }

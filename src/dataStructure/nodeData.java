@@ -16,7 +16,7 @@ public class nodeData implements node_data
 		this.key=nextID;
 		this.location=null;
 		this.weight=0;
-		this.info=null;
+		this.info="";
 		this.tag=0;
 		nextID++;
 	}
