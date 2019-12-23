@@ -1,6 +1,9 @@
 package dataStructure;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import algorithms.Graph_Algo;
 import algorithms.graph_algorithms;
 import utils.Point3D;
@@ -88,24 +91,65 @@ public class test {
 //		System.out.println(al.isConnected());
 		
 		//check shortestPath	
+//		graph g=new DGraph();
+//		for(int i=0;i<5;i++)
+//		{
+//			Point3D p=new Point3D(i,i,i);
+//			node_data a=new nodeData(p,0,null,0);
+//			g.addNode(a);
+//		}
+//		g.connect(0,1,2);
+//		g.connect(1,0,2);
+//		g.connect(0,3,12);
+//		g.connect(1,2,7);
+//		g.connect(1,4,5);
+//		g.connect(2,4,1);
+//		g.connect(4,3,3);
+//		g.connect(2,3,3);
+//		Graph_Algo al=new Graph_Algo();
+//		al.init(g);
+//		System.out.println(al.shortestPathDist(3, 0));
+
+		//check mix array	
+//		graph g=new DGraph();
+//		Graph_Algo al=new Graph_Algo();
+//		List<Integer> mix=new ArrayList<Integer>();
+//		mix.add(1);mix.add(2);	mix.add(3);mix.add(4);mix.add(5);mix.add(6);mix.add(7);	mix.add(8);mix.add(9);mix.add(10);
+//		al.mixArray(mix);
+//		al.mixArray(mix);
+//		al.mixArray(mix);
+//		al.mixArray(mix);
+//		al.mixArray(mix);
+		
+//		check tsp
 		graph g=new DGraph();
-		for(int i=0;i<5;i++)
+		for(int i=0;i<7;i++)
 		{
 			Point3D p=new Point3D(i,i,i);
 			node_data a=new nodeData(p,0,null,0);
 			g.addNode(a);
 		}
 		g.connect(0,1,2);
-		g.connect(1,0,2);
-		g.connect(0,3,12);
-		g.connect(1,2,7);
-		g.connect(1,4,5);
-		g.connect(2,4,1);
-		g.connect(4,3,3);
-		g.connect(2,3,3);
+		g.connect(1,2,2);
+		g.connect(2,3,2);
+		g.connect(3,4,2);
+		g.connect(4,3,2);
+		g.connect(4,5,2);
+
+		g.connect(3,5,2);
+		g.connect(5,6,2);
+	//	g.connect(4,3,3);
+//		g.connect(2,3,3);
 		Graph_Algo al=new Graph_Algo();
 		al.init(g);
-		al.shortestPath(0,3);
+		List<Integer> mix=new ArrayList<Integer>();
+		mix.add(1);mix.add(0);mix.add(3);mix.add(2);mix.add(6);mix.add(4);mix.add(5);
+		List<node_data> test=al.TSP(mix);
+		for(int i=0;i<test.size();i++)
+		{
+			System.out.println(test.get(i).getKey());
+
+		}
 
 
 

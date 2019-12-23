@@ -1,10 +1,11 @@
 package dataStructure;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-public class DGraph implements graph
+public class DGraph implements graph, Serializable
 {
     HashMap<Integer,node_data> vertices; 
     HashMap<Integer, HashMap<Integer,edge_data> > edges; //integer is the vertices and the arraylist save his edge
