@@ -61,8 +61,10 @@ import java.io.IOException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.NoSuchElementException;
 import javax.imageio.ImageIO;
@@ -74,6 +76,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+
+import algorithms.Graph_Algo;
+import dataStructure.edge_data;
+import dataStructure.graph;
+import dataStructure.nodeData;
+import dataStructure.node_data;
+import gui.Graph_GUI;
 
 /**
  *  The {@code StdDraw} class provides a basic capability for
@@ -606,6 +615,8 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 	// default font
 	private static final Font DEFAULT_FONT = new Font("SansSerif", Font.PLAIN, 16);
 
+	private static final ActionListener Garph_GUI = null;
+
 	// current font
 	private static Font font;
 
@@ -626,13 +637,17 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 
 	// queue of typed key characters
 	private static LinkedList<Character> keysTyped = new LinkedList<Character>();
+	private  static double porporY=0;
 
 	// set of key codes currently pressed down
 	private static TreeSet<Integer> keysDown = new TreeSet<Integer>();
-
 	// singleton pattern: client can't instantiate
 	private StdDraw() { }
 
+	private static graph g;
+	private static Graph_Algo ga=new Graph_Algo();
+	private static Graph_GUI gg;
+	private String window;
 
 	// static initializer
 	static {
@@ -669,7 +684,12 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		height = canvasHeight;
 		init();
 	}
-
+	
+	public static void setGraph(graph gr) {
+		g=gr;
+		ga.init(g);
+	}
+	
 	// init
 	private static void init() {
 		if (frame != null) frame.setVisible(false);
@@ -710,6 +730,8 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		frame.pack();
 		frame.requestFocusInWindow();
 		frame.setVisible(true);
+
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
 	// create the menu bar (changed to private)
@@ -722,6 +744,20 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		menuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		menu.add(menuItem1);
+
+		JMenu menu2 = new JMenu("Algo");
+		menuBar.add(menu2);
+		JMenuItem menuItem21 = new JMenuItem(" is_connected ");
+		menuItem21.addActionListener(std);
+		menu2.add(menuItem21);
+		JMenuItem menuItem22 = new JMenuItem(" shortestPathDist ");
+		menuItem22.addActionListener(std);
+		menu2.add(menuItem22);
+		JMenuItem menuItem23 = new JMenuItem(" TSP ");
+		menuItem23.addActionListener(std);
+		menu2.add(menuItem23);
+		
+		
 		return menuBar;
 	}
 
@@ -1654,13 +1690,54 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		FileDialog chooser = new FileDialog(StdDraw.frame, "Use a .png or .jpg extension", FileDialog.SAVE);
-		chooser.setVisible(true);
-		String filename = chooser.getFile();
-		if (filename != null) {
-			StdDraw.save(chooser.getDirectory() + File.separator + chooser.getFile());
+		if(e.getActionCommand().equals(" Save...   ")) {
+			FileDialog chooser = new FileDialog(StdDraw.frame, "Use a .png or .jpg extension", FileDialog.SAVE);
+			chooser.setVisible(true);
+			String filename = chooser.getFile();
+			if (filename != null) {
+				StdDraw.save(chooser.getDirectory() + File.separator + chooser.getFile());
+			}
+
+		}
+		if(e.getActionCommand().equals(" is_connected ")) {
+			double maxX=Double.NEGATIVE_INFINITY;
+			double maxY=Double.NEGATIVE_INFINITY;
+			double minX=Double.POSITIVE_INFINITY;
+			double minY=Double.POSITIVE_INFINITY;
+
+			for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();) {
+				node_data point=verIter.next();
+				if(point.getLocation().x()>maxX)
+					maxX=point.getLocation().x();
+				if(point.getLocation().y()>maxY)
+					maxY=point.getLocation().y();
+				if(point.getLocation().x()<minX)
+					minX=point.getLocation().x();
+				if(point.getLocation().y()<minY)
+					minY=point.getLocation().y();	
+			}
+			
+			StdDraw.setPenColor(Color.BLACK);
+			
+			if(ga.isConnected()) 
+				StdDraw.text((maxX+minX)/2.0,(maxY+minY)/2.0,"YES! the graph is connected");
+			else
+				StdDraw.text((maxX+minX)/2.0,(maxY+minY)/2.0,"NO! the graph isn't connected");
+		}
+		
+		if(e.getActionCommand().equals(" shortestPathDist ")) 
+		{
+			this.window=" shortestPathDist ";
+		}
+		
+		if(e.getActionCommand().equals(" TSP ")) 
+		{
+			this.window=" TSP ";
 		}
 	}
+
+
+
 
 
 	/***************************************************************************
@@ -1713,14 +1790,119 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		}
 	}
 
+	private int srcForShortestPathDist=-1;
+	private int destForShortestPathDist=-1;
+	private final double EPSILON=1;
+	private List<Integer> targetsForTSP=new ArrayList<Integer>();
+	
+	
+	private node_data findNode(double x,double y) {
+		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();) {
+			node_data nd=verIter.next();
+			if(Math.abs(x-nd.getLocation().x())<=this.EPSILON&&Math.abs(y-nd.getLocation().y())<=this.EPSILON)
+				return nd;
+		}
+		return null;
+	}
+	
+	private void paintShortestPathDist(int src,int dest) 
+	{
+		List<node_data> ver=ga.shortestPath(src, dest);
+		for(int i=0;i<ver.size()-1;i++)
+		{
+			StdDraw.setPenColor(Color.PINK);
+			StdDraw.setPenRadius(0.005);
+			StdDraw.line(ver.get(i).getLocation().x(),ver.get(i).getLocation().y(),ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
+			StdDraw.setPenColor(Color.GREEN);
+			StdDraw.setPenRadius(0.015);
+			StdDraw.point(ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
+		}
+	}
+	
+	private void paintTSP(List<Integer> targets) 
+	{
+		List<node_data> ver=ga.TSP(targets);
+		for(int i=0;i<ver.size()-1;i++)
+		{
+			StdDraw.setPenColor(Color.PINK);
+			StdDraw.setPenRadius(0.005);
+			StdDraw.line(ver.get(i).getLocation().x(),ver.get(i).getLocation().y(),ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
+			StdDraw.setPenColor(Color.GREEN);
+			StdDraw.setPenRadius(0.015);
+			StdDraw.point(ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
+		}
+	}
 
+	
+	
 	/**
 	 * This method cannot be called directly.
 	 */
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		// this body is intentionally left empty
+	public void mouseClicked(MouseEvent arg0) {
+		
+		
+		double maxX=Double.NEGATIVE_INFINITY;
+		double maxY=Double.NEGATIVE_INFINITY;
+		double minX=Double.POSITIVE_INFINITY;
+		double minY=Double.POSITIVE_INFINITY;
+
+		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();) {
+			node_data point=verIter.next();
+			if(point.getLocation().x()>maxX)
+				maxX=point.getLocation().x();
+			if(point.getLocation().y()>maxY)
+				maxY=point.getLocation().y();
+			if(point.getLocation().x()<minX)
+				minX=point.getLocation().x();
+			if(point.getLocation().y()<minY)
+				minY=point.getLocation().y();	
+		}
+		double porY=(Math.abs(minY)+Math.abs(maxY))/20;
+		double porX=(Math.abs(minX)+Math.abs(maxX))/20;
+		minX=minX-porX;
+		minY=minY-porY;
+		maxX=maxX+porX;
+		maxY=maxY+porY;
+		double x=((maxX-minX)/width)*(double)arg0.getX()+minX;
+		double y=((minY-maxY)/height)*(double)arg0.getY()+maxY;
+
+		
+		if(this.window==" shortestPathDist ") {
+			
+			if(this.srcForShortestPathDist==-1) {
+				if(this.findNode(x,y)!=null) {
+					System.out.println("found");
+					StdDraw.setPenColor(Color.GREEN);
+					StdDraw.setPenRadius(0.015);
+					StdDraw.point(this.findNode(x,y).getLocation().x(), this.findNode(x,y).getLocation().y());
+					this.srcForShortestPathDist=this.findNode(x,y).getKey();
+				}
+			}
+			else if(this.destForShortestPathDist==-1) {
+				if(this.findNode(x,y)!=null) {
+					this.destForShortestPathDist=this.findNode(x,y).getKey();
+				}
+			}
+			
+			if(this.srcForShortestPathDist!=-1&&this.destForShortestPathDist!=-1) {
+				this.paintShortestPathDist(this.srcForShortestPathDist,this.destForShortestPathDist);
+			}
+			// this body is intentionally left empty
+		}
+		
+		if(this.window==" TSP ") {
+			if(this.findNode(x,y)!=null)
+				this.targetsForTSP.add(this.findNode(x,y).getKey());
+			if(this.targetsForTSP.size()>1)
+				this.paintTSP(this.targetsForTSP);
+		}
 	}
+	
+	
+
+
+
 
 	/**
 	 * This method cannot be called directly.
@@ -1869,7 +2051,6 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 			keysDown.remove(e.getKeyCode());
 		}
 	}
-
 
 
 

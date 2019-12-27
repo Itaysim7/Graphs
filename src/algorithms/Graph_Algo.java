@@ -206,14 +206,6 @@ public class Graph_Algo implements graph_algorithms
 		else 
 			return null;
 	}
-
-	private List<Integer> copyTargets(List<Integer> targets){
-		List<Integer> copyTargets=new ArrayList<Integer> ();
-		for(int i=0;i<targets.size();i++) {
-			copyTargets.add(targets.get(i));
-		}
-		return copyTargets;
-	}
 	/**
 	 * computes a relatively short path which visit each node in the targets List.
 	 * Note: this is NOT the classical traveling salesman problem, 
@@ -223,51 +215,101 @@ public class Graph_Algo implements graph_algorithms
 	 * @return
 	 */
 	@Override
+//	public List<node_data> TSP(List<Integer> targets) 
+//	{
+//		double min=Double.POSITIVE_INFINITY;
+//		List<node_data> TSPlist=new ArrayList<node_data>();
+//		List<node_data> TSPlistFinal=new ArrayList<node_data>();
+//		for(int k=0;k<targets.size()*1000;k++) //check 1000*targets.size random path and save the shortest
+//		{
+//			while(TSPlist.size()!=0)//remove the oldest node 
+//			{
+//				TSPlist.remove(0);
+//			}
+//			double curtainMin=0;
+//			TSPlist.add(g.getNode(targets.get(0)));//add the first node
+//			boolean pathArray=true;//if there is a path from index 0 to 1 ,index 1 to 2 ...index n-1 to n
+//			for(int i=0;i<targets.size()-1&&pathArray;i++)//check the regular path
+//			{
+//				if(this.isPath(targets.get(i),targets.get(i+1)))//check if there is a path
+//				{
+//					curtainMin=curtainMin+this.shortestPathDist(targets.get(i),targets.get(i+1));
+//					List<node_data> temp=this.shortestPath(targets.get(i),targets.get(i+1));
+//					for(int j=1;j<temp.size();j++) //add the vertices from i to i+1 to the list
+//					{
+//						TSPlist.add(temp.get(j));
+//					}
+//				}
+//				else
+//				{
+//					pathArray=false;
+//				}
+//			}
+//			if(pathArray&&curtainMin<min)
+//			{
+//				min=curtainMin;
+//				while(TSPlistFinal.size()!=0)//remove the oldest node
+//				{
+//					TSPlistFinal.remove(0);
+//				}
+//				for(int i=0;i<TSPlist.size();i++)//copy the curtain tsplist to the final
+//				{
+//					TSPlistFinal.add(TSPlist.get(i));
+//				}	
+//			}
+//			this.mixArray(targets);//mix the array and try different path
+//		}
+//		return TSPlistFinal;
+//	}
 	public List<node_data> TSP(List<Integer> targets) 
 	{
-		double min=Double.POSITIVE_INFINITY;
-		List<node_data> TSPlist=new ArrayList<node_data>();
-		List<node_data> TSPlistFinal=new ArrayList<node_data>();
-		for(int k=0;k<targets.size()*1000;k++) //check 1000*targets.size random path and save the shortest
+		if(!this.isConnected())
+			return null;
+		int saveDest=0;
+		int saveDestIndex=0;
+		List<node_data> TSP=new ArrayList<node_data>();
+		int i=0;
+		boolean first=true;
+		while(targets.size()>1) 
 		{
-			while(TSPlist.size()!=0)//remove the oldest node 
+			double minWay=Double.POSITIVE_INFINITY;
+			for(int j=0;j<targets.size();j++) 
 			{
-				TSPlist.remove(0);
-			}
-			double curtainMin=0;
-			TSPlist.add(g.getNode(targets.get(0)));//add the first node
-			boolean pathArray=true;//if there is a path from index 0 to 1 ,index 1 to 2 ...index n-1 to n
-			for(int i=0;i<targets.size()-1&&pathArray;i++)//check the regular path
-			{
-				if(this.isPath(targets.get(i),targets.get(i+1)))//check if there is a path
+				if(i!=j) 
 				{
-					curtainMin=curtainMin+this.shortestPathDist(targets.get(i),targets.get(i+1));
-					List<node_data> temp=this.shortestPath(targets.get(i),targets.get(i+1));
-					for(int j=1;j<temp.size();j++) //add the vertices from i to i+1 to the list
+					if(this.shortestPathDist(targets.get(i), targets.get(j))<minWay) 
 					{
-						TSPlist.add(temp.get(j));
+						minWay=this.shortestPathDist(targets.get(i), targets.get(j));
+						saveDest=targets.get(j);
+						saveDestIndex=j;
 					}
 				}
-				else
-				{
-					pathArray=false;
-				}
 			}
-			if(pathArray&&curtainMin<min)
+			List <node_data>temp=this.shortestPath(targets.get(i), saveDest);
+			if(!first)
+				temp.remove(0);
+			TSP.addAll(temp);
+			for(Iterator<node_data> verIter=this.shortestPath(targets.get(i), saveDest).iterator();verIter.hasNext();) 
 			{
-				min=curtainMin;
-				while(TSPlistFinal.size()!=0)//remove the oldest node
+				node_data nd=verIter.next();
+				if(targets.contains(nd.getKey())&&nd.getKey()!=saveDest) 
 				{
-					TSPlistFinal.remove(0);
-				}
-				for(int i=0;i<TSPlist.size();i++)//copy the curtain tsplist to the final
-				{
-					TSPlistFinal.add(TSPlist.get(i));
+						for(int j=0;j<targets.size();j++) 
+						{
+							if(targets.get(j)==nd.getKey())
+								targets.remove(j);
+						}
 				}	
 			}
-			this.mixArray(targets);//mix the array and try different path
+			for(int j=0;j<targets.size();j++) {
+				if(targets.get(j)==saveDest) {
+					i=j;
+					break;
+				}
+			}
+			first=false;
 		}
-		return TSPlistFinal;
+		return TSP;
 	}
 	/** 
 	 * Compute a deep copy of this graph.

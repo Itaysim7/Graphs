@@ -6,6 +6,7 @@ import java.util.List;
 
 import algorithms.Graph_Algo;
 import algorithms.graph_algorithms;
+import gui.Graph_GUI;
 import utils.Point3D;
 
 public class test {
@@ -144,13 +145,15 @@ public class test {
 		al.init(g);
 		List<Integer> mix=new ArrayList<Integer>();
 		mix.add(1);mix.add(0);mix.add(3);mix.add(2);mix.add(6);mix.add(4);mix.add(5);
-		List<node_data> test=al.TSP(mix);
-		for(int i=0;i<test.size();i++)
-		{
-			System.out.println(test.get(i).getKey());
-
-		}
-
+////		List<node_data> test=al.TSP(mix);
+//		for(int i=0;i<test.size();i++)
+//		{
+//			System.out.println(test.get(i).getKey());
+//
+//		}
+		
+		Graph_GUI a=new Graph_GUI(g);
+		a.equals(a);
 
 
 //		for(int i=0;i<100000;i++)
