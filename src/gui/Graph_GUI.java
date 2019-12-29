@@ -93,8 +93,7 @@ public class Graph_GUI extends JFrame {
 		g.connect(v5.getKey(),v6.getKey(),5);
 		g.connect(v6.getKey(),v1.getKey(),6);
 		g.connect(v1.getKey(),v0.getKey(),7);
-		
-		Graph_GUI windoww = new Graph_GUI(g);
+		Graph_GUI windoww1 = new Graph_GUI(g);
 	}
 	
 	

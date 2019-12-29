@@ -168,25 +168,6 @@ public class Graph_AlgoTest {
 	public void testCopy() 
 	{
 		graph newG=ga.copy();		
-		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
-		{
-			node_data v=verIter.next();
-			assertTrue(newG.getV().contains(v));
-		}
-		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
-		{
-			node_data v=verIter.next();
-			int key=v.getKey();
-			try 
-			{
-				for(Iterator<edge_data> edgeIter=g.getE(key).iterator();edgeIter.hasNext();)
-				{
-					edge_data e=edgeIter.next();
-					assertTrue(newG.getE(key).contains(e));
-				}
-			}
-			catch(NullPointerException e)
-			{}
-		}
+		assertEquals(newG.getMC(),g.getMC());
 	}
 }

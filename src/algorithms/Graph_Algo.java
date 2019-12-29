@@ -306,36 +306,11 @@ public class Graph_Algo implements graph_algorithms
 	 */
 	@Override
 	public graph copy() 
-	{
-		graph copy=new DGraph();		
-
-		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
-
-		{
-
-			node_data v=verIter.next();
-
-			copy.addNode(v);
-
-		}
-
-		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
-		{
-			node_data v=verIter.next();
-			int key=v.getKey();
-			try 
-			{
-				for(Iterator<edge_data> edgeIter=g.getE(key).iterator();edgeIter.hasNext();)
-				{
-					edge_data e=edgeIter.next();
-					copy.connect(e.getSrc(),e.getDest(),e.getWeight());
-				}
-			}
-			catch(NullPointerException e)
-			{
-			}
-		}
-		return g;
+	{		
+		this.save("copy.txt");
+		Graph_Algo copy=new Graph_Algo();
+		copy.init("copy.txt");
+	    return copy.g;
 	}
 	/**
 	 * change the color of all the vertices to white (0)
