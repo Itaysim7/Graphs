@@ -29,20 +29,8 @@ import utils.StdDraw;
 
 public class Graph_GUI extends JFrame {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private graph gr;
-	private Graph_Algo ga;
-	private double porporY;
-	
-	
 	public Graph_GUI( graph gr) 
 	{
-		this.gr=gr;
-		ga=new Graph_Algo();
-		ga.init(gr);
 		
 		double maxX=Double.NEGATIVE_INFINITY;
 		double maxY=Double.NEGATIVE_INFINITY;
@@ -62,62 +50,13 @@ public class Graph_GUI extends JFrame {
 		} 
 		double porY=(Math.abs(minY)+Math.abs(maxY))/20;
 		double porX=(Math.abs(minX)+Math.abs(maxX))/20;
-		porporY=(Math.abs(minY)+Math.abs(maxY))/50;
 		StdDraw.setCanvasSize(800,600);
 		StdDraw.setXscale(minX-porX,maxX+porX);
 		StdDraw.setYscale(minY-porY,maxY+porY);
 		StdDraw.setGraph(gr);
-		this.paint();
+		StdDraw.paint();
 	}
 	
-	public void paint() {
-		
-		for(Iterator<node_data> verIter=gr.getV().iterator();verIter.hasNext();) 
-		{
-			node_data point=verIter.next();
-
-			StdDraw.setPenColor(Color.BLUE);
-			StdDraw.setPenRadius(0.020);
-			StdDraw.point((int)point.getLocation().x(), (int)point.getLocation().y());
-			StdDraw.text(point.getLocation().x(),point.getLocation().y()+porporY, (""+point.getKey()));
-			
-			try {//in case point does not have edge the function getE return exception, and we do not want exception we just do not want it to paint
-				for(Iterator<edge_data> edgeIter=gr.getE(point.getKey()).iterator();edgeIter.hasNext();) 
-				{
-					edge_data line=edgeIter.next();
-					node_data dest=new nodeData();
-					node_data src=point;
-					for(Iterator<node_data> destIter=gr.getV().iterator();destIter.hasNext();) //find dest node
-					{
-						node_data temp=destIter.next();
-						if(temp.getKey()==line.getDest())
-							dest=temp;
-					}
-					StdDraw.setPenColor(Color.RED);
-					StdDraw.setPenRadius(0.005);
-					StdDraw.line((int)src.getLocation().x(),(int)src.getLocation().y(), (int)dest.getLocation().x(), (int)dest.getLocation().y());
-					StdDraw.text((int)((src.getLocation().x()+dest.getLocation().x())/2),(int)((src.getLocation().y()+dest.getLocation().y())/2),(""+line.getWeight()));
-					
-					StdDraw.setPenColor(Color.YELLOW);
-					StdDraw.setPenRadius(0.015);
-					if(src.getLocation().x()<dest.getLocation().x()) {
-						if(src.getLocation().y()<dest.getLocation().y())
-							StdDraw.point((int)dest.getLocation().x()-0.5,(int)dest.getLocation().y()-0.5);
-						else
-							StdDraw.point((int)dest.getLocation().x()-0.5,(int)dest.getLocation().y()+0.5);
-					}
-					else {
-						if(src.getLocation().y()<dest.getLocation().y())
-							StdDraw.point((int)dest.getLocation().x()+0.5,(int)dest.getLocation().y()-0.5);
-						else
-							StdDraw.point((int)dest.getLocation().x()+0.5,(int)dest.getLocation().y()-0.5);
-					}
-					
-				}
-			}
-			catch (Exception e) {}
-		}
-	}
 	
 	
 	public static void main(String[] args) 

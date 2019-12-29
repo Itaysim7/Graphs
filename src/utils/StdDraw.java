@@ -637,7 +637,7 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 
 	// queue of typed key characters
 	private static LinkedList<Character> keysTyped = new LinkedList<Character>();
-	private  static double porporY=0;
+
 
 	// set of key codes currently pressed down
 	private static TreeSet<Integer> keysDown = new TreeSet<Integer>();
@@ -646,7 +646,8 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 
 	private static graph g;
 	private static Graph_Algo ga=new Graph_Algo();
-	private static Graph_GUI gg;
+	private static double porporY=0;
+
 	private String window;
 
 	// static initializer
@@ -688,6 +689,76 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 	public static void setGraph(graph gr) {
 		g=gr;
 		ga.init(g);
+		double maxX=Double.NEGATIVE_INFINITY;
+		double maxY=Double.NEGATIVE_INFINITY;
+		double minX=Double.POSITIVE_INFINITY;
+		double minY=Double.POSITIVE_INFINITY;
+
+		for(Iterator<node_data> verIter=gr.getV().iterator();verIter.hasNext();) {
+			node_data point=verIter.next();
+			if(point.getLocation().x()>maxX)
+				maxX=point.getLocation().x();
+			if(point.getLocation().y()>maxY)
+				maxY=point.getLocation().y();
+			if(point.getLocation().x()<minX)
+				minX=point.getLocation().x();
+			if(point.getLocation().y()<minY)
+				minY=point.getLocation().y();	
+		} 
+		porporY=(Math.abs(minY)+Math.abs(maxY))/50;
+	}
+	
+	public static void paint() {
+		
+		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();) 
+		{
+			node_data point=verIter.next();
+
+			StdDraw.setPenColor(Color.BLUE);
+			StdDraw.setPenRadius(0.020);
+			StdDraw.point(point.getLocation().x(),point.getLocation().y());
+			StdDraw.text(point.getLocation().x(),point.getLocation().y()+porporY, (""+point.getKey()));
+			
+			try {//in case point does not have edge the function getE return exception, and we do not want exception we just do not want it to paint
+				for(Iterator<edge_data> edgeIter=g.getE(point.getKey()).iterator();edgeIter.hasNext();) 
+				{
+					edge_data line=edgeIter.next();
+					node_data dest=new nodeData();
+					node_data src=point;
+					for(Iterator<node_data> destIter=g.getV().iterator();destIter.hasNext();) //find dest node
+					{
+						node_data temp=destIter.next();
+						if(temp.getKey()==line.getDest())
+							dest=temp;
+					}
+					StdDraw.setPenColor(Color.RED);
+					StdDraw.setPenRadius(0.005);
+					StdDraw.line(src.getLocation().x(),src.getLocation().y(), dest.getLocation().x(),dest.getLocation().y());
+					StdDraw.text(((src.getLocation().x()+dest.getLocation().x())/2),((src.getLocation().y()+dest.getLocation().y())/2),(""+line.getWeight()));
+					
+					StdDraw.setPenColor(Color.YELLOW);
+					StdDraw.setPenRadius(0.015);
+					double x=Math.abs(src.getLocation().x()-dest.getLocation().x())/10.0;
+					double y=Math.abs(src.getLocation().y()-dest.getLocation().y())/10.0;
+					
+					if(src.getLocation().x()<dest.getLocation().x()) {
+						
+						if(src.getLocation().y()<dest.getLocation().y())
+							StdDraw.point((int)dest.getLocation().x()-x,(int)dest.getLocation().y()-y);
+						else
+							StdDraw.point((int)dest.getLocation().x()-x,(int)dest.getLocation().y()+y);
+					}
+					else {
+						if(src.getLocation().y()<dest.getLocation().y())
+							StdDraw.point((int)dest.getLocation().x()+x,(int)dest.getLocation().y()-y);
+						else
+							StdDraw.point((int)dest.getLocation().x()+x,(int)dest.getLocation().y()+y);
+					}
+					
+				}
+			}
+			catch (Exception e) {}
+		}
 	}
 	
 	// init
@@ -1841,7 +1912,6 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		
-		
 		double maxX=Double.NEGATIVE_INFINITY;
 		double maxY=Double.NEGATIVE_INFINITY;
 		double minX=Double.POSITIVE_INFINITY;
@@ -1866,6 +1936,8 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		maxY=maxY+porY;
 		double x=((maxX-minX)/width)*(double)arg0.getX()+minX;
 		double y=((minY-maxY)/height)*(double)arg0.getY()+maxY;
+		
+		System.out.println(x+","+y);
 
 		
 		if(this.window==" shortestPathDist ") {
@@ -1894,8 +1966,10 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		if(this.window==" TSP ") {
 			if(this.findNode(x,y)!=null)
 				this.targetsForTSP.add(this.findNode(x,y).getKey());
-			if(this.targetsForTSP.size()>1)
+			if(this.targetsForTSP.size()>1) {
+				this.paint();
 				this.paintTSP(this.targetsForTSP);
+			}
 		}
 	}
 	

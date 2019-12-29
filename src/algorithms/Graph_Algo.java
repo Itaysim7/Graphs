@@ -273,7 +273,7 @@ public class Graph_Algo implements graph_algorithms
 		while(targets.size()>1) 
 		{
 			double minWay=Double.POSITIVE_INFINITY;
-			for(int j=0;j<targets.size();j++) 
+			for(int j=0;j<targets.size();j++) //find the closes dest
 			{
 				if(i!=j) 
 				{
@@ -285,23 +285,12 @@ public class Graph_Algo implements graph_algorithms
 					}
 				}
 			}
-			List <node_data>temp=this.shortestPath(targets.get(i), saveDest);
-			if(!first)
+			List <node_data>temp=this.shortestPath(targets.get(i), saveDest);//save the path to this dest
+			if(!first)//the function saved the dest already and the dest is the first on the temp list so it delete so we don't have a this key twice.
 				temp.remove(0);
 			TSP.addAll(temp);
-			for(Iterator<node_data> verIter=this.shortestPath(targets.get(i), saveDest).iterator();verIter.hasNext();) 
-			{
-				node_data nd=verIter.next();
-				if(targets.contains(nd.getKey())&&nd.getKey()!=saveDest) 
-				{
-						for(int j=0;j<targets.size();j++) 
-						{
-							if(targets.get(j)==nd.getKey())
-								targets.remove(j);
-						}
-				}	
-			}
-			for(int j=0;j<targets.size();j++) {
+			targets.remove(i);
+			for(int j=0;j<targets.size();j++) {//fine the dest and make him the next src
 				if(targets.get(j)==saveDest) {
 					i=j;
 					break;
