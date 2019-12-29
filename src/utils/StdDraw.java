@@ -815,6 +815,9 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		menuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		menu.add(menuItem1);
+		JMenuItem menuItem11 = new JMenuItem("init");
+		menuItem11.addActionListener(std);
+		menu.add(menuItem11);
 
 		JMenu menu2 = new JMenu("Algo");
 		menuBar.add(menu2);
@@ -1770,6 +1773,14 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 			}
 
 		}
+		if(e.getActionCommand().equals("init")) {
+			FileDialog chooser = new FileDialog(StdDraw.frame, "Use a .png or .jpg extension", FileDialog.LOAD);
+			chooser.setVisible(true);
+			String filename = chooser.getFile();
+			if (filename != null) {
+				StdDraw.save(chooser.getDirectory() + File.separator + chooser.getFile());
+			}
+		}
 		if(e.getActionCommand().equals(" is_connected ")) {
 			double maxX=Double.NEGATIVE_INFINITY;
 			double maxY=Double.NEGATIVE_INFINITY;
@@ -1892,7 +1903,12 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 	
 	private void paintTSP(List<Integer> targets) 
 	{
-		List<node_data> ver=ga.TSP(targets);
+		List <Integer> t=new ArrayList();
+		for(int i=0;i<targets.size();i++) {//copy for targets because TSP delete the targets. 
+			t.add(targets.get(i));
+		}
+		List<node_data> ver=ga.TSP(t);
+		
 		for(int i=0;i<ver.size()-1;i++)
 		{
 			StdDraw.setPenColor(Color.PINK);
@@ -1936,15 +1952,12 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		maxY=maxY+porY;
 		double x=((maxX-minX)/width)*(double)arg0.getX()+minX;
 		double y=((minY-maxY)/height)*(double)arg0.getY()+maxY;
-		
-		System.out.println(x+","+y);
 
 		
 		if(this.window==" shortestPathDist ") {
 			
 			if(this.srcForShortestPathDist==-1) {
 				if(this.findNode(x,y)!=null) {
-					System.out.println("found");
 					StdDraw.setPenColor(Color.GREEN);
 					StdDraw.setPenRadius(0.015);
 					StdDraw.point(this.findNode(x,y).getLocation().x(), this.findNode(x,y).getLocation().y());
@@ -1964,8 +1977,12 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		}
 		
 		if(this.window==" TSP ") {
-			if(this.findNode(x,y)!=null)
+			if(this.findNode(x,y)!=null) {
 				this.targetsForTSP.add(this.findNode(x,y).getKey());
+				StdDraw.setPenColor(Color.GREEN);
+				StdDraw.setPenRadius(0.015);
+				StdDraw.point(this.findNode(x,y).getLocation().x(), this.findNode(x,y).getLocation().y());
+			}
 			if(this.targetsForTSP.size()>1) {
 				this.paint();
 				this.paintTSP(this.targetsForTSP);

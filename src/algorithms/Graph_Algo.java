@@ -26,7 +26,7 @@ import dataStructure.node_data;
 public class Graph_Algo implements graph_algorithms
 {
 	private graph g;
-	
+
 	/**
 	 * Init this set of algorithms on the parameter - graph.
 	 * @param g - graph
@@ -215,88 +215,35 @@ public class Graph_Algo implements graph_algorithms
 	 * @return
 	 */
 	@Override
-//	public List<node_data> TSP(List<Integer> targets) 
-//	{
-//		double min=Double.POSITIVE_INFINITY;
-//		List<node_data> TSPlist=new ArrayList<node_data>();
-//		List<node_data> TSPlistFinal=new ArrayList<node_data>();
-//		for(int k=0;k<targets.size()*1000;k++) //check 1000*targets.size random path and save the shortest
-//		{
-//			while(TSPlist.size()!=0)//remove the oldest node 
-//			{
-//				TSPlist.remove(0);
-//			}
-//			double curtainMin=0;
-//			TSPlist.add(g.getNode(targets.get(0)));//add the first node
-//			boolean pathArray=true;//if there is a path from index 0 to 1 ,index 1 to 2 ...index n-1 to n
-//			for(int i=0;i<targets.size()-1&&pathArray;i++)//check the regular path
-//			{
-//				if(this.isPath(targets.get(i),targets.get(i+1)))//check if there is a path
-//				{
-//					curtainMin=curtainMin+this.shortestPathDist(targets.get(i),targets.get(i+1));
-//					List<node_data> temp=this.shortestPath(targets.get(i),targets.get(i+1));
-//					for(int j=1;j<temp.size();j++) //add the vertices from i to i+1 to the list
-//					{
-//						TSPlist.add(temp.get(j));
-//					}
-//				}
-//				else
-//				{
-//					pathArray=false;
-//				}
-//			}
-//			if(pathArray&&curtainMin<min)
-//			{
-//				min=curtainMin;
-//				while(TSPlistFinal.size()!=0)//remove the oldest node
-//				{
-//					TSPlistFinal.remove(0);
-//				}
-//				for(int i=0;i<TSPlist.size();i++)//copy the curtain tsplist to the final
-//				{
-//					TSPlistFinal.add(TSPlist.get(i));
-//				}	
-//			}
-//			this.mixArray(targets);//mix the array and try different path
-//		}
-//		return TSPlistFinal;
-//	}
 	public List<node_data> TSP(List<Integer> targets) 
 	{
 		if(!this.isConnected())
 			return null;
-		int saveDest=0;
-		int saveDestIndex=0;
 		List<node_data> TSP=new ArrayList<node_data>();
-		int i=0;
-		boolean first=true;
-		while(targets.size()>1) 
+		int indexSrc=(int)(Math.random()*targets.size());//start from random vertex in the list
+		int src=targets.get(indexSrc);
+		targets.remove(indexSrc);
+		int dest=0,indexDest=0;
+		TSP.add(g.getNode(src));
+		while(targets.size()>0) 
 		{
 			double minWay=Double.POSITIVE_INFINITY;
-			for(int j=0;j<targets.size();j++) //find the closes dest
+			for(int j=0;j<targets.size();j++) //find the vertex that is the closest to src
 			{
-				if(i!=j) 
+				if(this.shortestPathDist(src, targets.get(j))<minWay) 
 				{
-					if(this.shortestPathDist(targets.get(i), targets.get(j))<minWay) 
-					{
-						minWay=this.shortestPathDist(targets.get(i), targets.get(j));
-						saveDest=targets.get(j);
-						saveDestIndex=j;
-					}
+					minWay=this.shortestPathDist(src, targets.get(j));
+					dest=targets.get(j);
+					indexDest=j;
 				}
 			}
-			List <node_data>temp=this.shortestPath(targets.get(i), saveDest);//save the path to this dest
-			if(!first)//the function saved the dest already and the dest is the first on the temp list so it delete so we don't have a this key twice.
-				temp.remove(0);
-			TSP.addAll(temp);
-			targets.remove(i);
-			for(int j=0;j<targets.size();j++) {//fine the dest and make him the next src
-				if(targets.get(j)==saveDest) {
-					i=j;
-					break;
-				}
+			List<node_data> TSPtemp=this.shortestPath(src, dest);
+			for(int j=1;j<TSPtemp.size();j++) //add the vertices from i to i+1 to the list
+			{
+				TSP.add(TSPtemp.get(j));
 			}
-			first=false;
+			src=dest;
+			targets.remove(indexDest);
 		}
 		return TSP;
 	}
@@ -310,7 +257,7 @@ public class Graph_Algo implements graph_algorithms
 		this.save("copy.txt");
 		Graph_Algo copy=new Graph_Algo();
 		copy.init("copy.txt");
-	    return copy.g;
+		return copy.g;
 	}
 	/**
 	 * change the color of all the vertices to white (0)
@@ -440,21 +387,6 @@ public class Graph_Algo implements graph_algorithms
 		ver.remove(index);
 		return minVer;
 	}
-	private void  mixArray(List<Integer> targets)
-	{
-		List<Integer> mix=new ArrayList<Integer>();
-		int indexRandom,randomNode;
-		while(targets.size()!=0)
-		{
-			indexRandom=(int)(Math.random()*targets.size());
-			randomNode=targets.get(indexRandom);
-			mix.add(randomNode);
-			targets.remove(indexRandom);
-		}
-		for(int i=0;i<mix.size();i++)
-		{
-			targets.add(mix.get(i));
-		}	
-	}
+
 
 }
