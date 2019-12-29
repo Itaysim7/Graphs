@@ -1,4 +1,4 @@
-This repository represents a graph some algorithms that can be done on it, and a GUI class that can draws the graph and its algorithms.
+This repository represents a graph and some algorithms that can be done on it, and a GUI class that can draws the graph and its algorithms.
 
 nodeData represents a vertex in the graph.
 it has those variables:
