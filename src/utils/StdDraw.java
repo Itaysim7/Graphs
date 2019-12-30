@@ -1756,7 +1756,7 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		else {
 			System.out.println("Invalid image file type: " + suffix);
 		}
-	}
+	} 
 
 
 	/**
@@ -1769,9 +1769,20 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 			chooser.setVisible(true);
 			String filename = chooser.getFile();
 			if (filename != null) {
-				StdDraw.save(chooser.getDirectory() + File.separator + chooser.getFile());
+				ga.save(filename);
 			}
 
+		}
+		if(e.getActionCommand().equals("init")) {
+			FileDialog chooser = new FileDialog(StdDraw.frame, "Use a .png or .jpg extension", FileDialog.LOAD);
+			chooser.setVisible(true);
+			String filename = chooser.getFile();
+			if (filename != null)
+			{
+				ga.init(filename);
+				g=ga.copy();
+				this.paint();
+			}
 		}
 		if(e.getActionCommand().equals("init")) {
 			FileDialog chooser = new FileDialog(StdDraw.frame, "Use a .png or .jpg extension", FileDialog.LOAD);
