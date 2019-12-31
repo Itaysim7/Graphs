@@ -1784,14 +1784,6 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 				this.paint();
 			}
 		}
-		if(e.getActionCommand().equals("init")) {
-			FileDialog chooser = new FileDialog(StdDraw.frame, "Use a .png or .jpg extension", FileDialog.LOAD);
-			chooser.setVisible(true);
-			String filename = chooser.getFile();
-			if (filename != null) {
-				StdDraw.save(chooser.getDirectory() + File.separator + chooser.getFile());
-			}
-		}
 		if(e.getActionCommand().equals(" is_connected ")) {
 			double maxX=Double.NEGATIVE_INFINITY;
 			double maxY=Double.NEGATIVE_INFINITY;
