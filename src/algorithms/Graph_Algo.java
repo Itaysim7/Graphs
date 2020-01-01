@@ -27,6 +27,10 @@ public class Graph_Algo implements graph_algorithms
 {
 	private graph g;
 
+	public Graph_Algo() {}
+	public Graph_Algo(graph g) {
+		this.g=g;
+	}
 	/**
 	 * Init this set of algorithms on the parameter - graph.
 	 * @param g - graph
