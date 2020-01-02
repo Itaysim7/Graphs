@@ -124,6 +124,12 @@ public class Graph_Algo implements graph_algorithms
 	@Override
 	public double shortestPathDist(int src, int dest) 
 	{
+		if(g.getNode(src)==null||g.getNode(dest)==null)
+		{
+			throw new RuntimeException("The vertex is not in the graph");
+		}
+		if(src==dest)
+			return 0;
 		this.weightInfi();//set all the weight vertices to infinity
 		this.resetInfo();// set all "father" vertices to null
 		this.resetTag();// set all "color" vertices to white
@@ -187,7 +193,16 @@ public class Graph_Algo implements graph_algorithms
 	@Override
 	public List<node_data> shortestPath(int src, int dest) 
 	{
+		if(g.getNode(src)==null||g.getNode(dest)==null)
+		{
+			throw new RuntimeException("The vertex is not in the graph");
+		}
 		List <node_data> path=new ArrayList <node_data>();
+		if(src==dest)
+		{
+			path.add(g.getNode(src));
+			return path;
+		}
 		double dis=this.shortestPathDist(src,dest);
 		if(dis<Double.POSITIVE_INFINITY)//if there is a path
 		{
