@@ -31,13 +31,9 @@ public class Graph_GUI extends JFrame {
 
 	public Graph_GUI( graph gr) 
 	{
-		
-		double maxX=Double.NEGATIVE_INFINITY;
-		double maxY=Double.NEGATIVE_INFINITY;
-		double minX=Double.POSITIVE_INFINITY;
-		double minY=Double.POSITIVE_INFINITY;
-
-		for(Iterator<node_data> verIter=gr.getV().iterator();verIter.hasNext();) {
+		double maxX=Double.NEGATIVE_INFINITY;double maxY=Double.NEGATIVE_INFINITY;double minX=Double.POSITIVE_INFINITY;double minY=Double.POSITIVE_INFINITY;
+		for(Iterator<node_data> verIter=gr.getV().iterator();verIter.hasNext();)
+		{
 			node_data point=verIter.next();
 			if(point.getLocation().x()>maxX)
 				maxX=point.getLocation().x();
@@ -50,14 +46,12 @@ public class Graph_GUI extends JFrame {
 		} 
 		double porY=(Math.abs(minY)+Math.abs(maxY))/20;
 		double porX=(Math.abs(minX)+Math.abs(maxX))/20;
-		StdDraw.setCanvasSize(800,600);
+		StdDraw.setCanvasSize(600,600);
 		StdDraw.setXscale(minX-porX,maxX+porX);
 		StdDraw.setYscale(minY-porY,maxY+porY);
 		StdDraw.setGraph(gr);
 		StdDraw.paint();
 	}
-	
-	
 	
 	public static void main(String[] args) 
 	{
@@ -65,7 +59,7 @@ public class Graph_GUI extends JFrame {
 		Point3D p0,p1,p2,p3,p4,p5,p6;
 		node_data v0,v1,v2,v3,v4,v5,v6;
 		g=new DGraph();
-		p0=new Point3D(0,0,0);
+		p0=new Point3D(1,0,0);
 		p1=new Point3D(0,10,10);
 		p2=new Point3D(20,0,-1);
 		p3=new Point3D(30,30,0);

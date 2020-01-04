@@ -708,12 +708,33 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		porporY=(Math.abs(minY)+Math.abs(maxY))/50;
 	}
 	
-	public static void paint() {
-		
+	public static void paint() 
+	{		
+		double maxX=Double.NEGATIVE_INFINITY;
+		double maxY=Double.NEGATIVE_INFINITY;
+		double minX=Double.POSITIVE_INFINITY;
+		double minY=Double.POSITIVE_INFINITY;
+
+		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
+		{
+			node_data point=verIter.next();
+			if(point.getLocation().x()>maxX)
+				maxX=point.getLocation().x();
+			if(point.getLocation().y()>maxY)
+				maxY=point.getLocation().y();
+			if(point.getLocation().x()<minX)
+				minX=point.getLocation().x();
+			if(point.getLocation().y()<minY)
+				minY=point.getLocation().y();	
+		} 
+		double porY=(Math.abs(minY)+Math.abs(maxY))/20;
+		double porX=(Math.abs(minX)+Math.abs(maxX))/20;
+		StdDraw.setCanvasSize(600,600);
+		StdDraw.setXscale(minX-porX,maxX+porX);
+		StdDraw.setYscale(minY-porY,maxY+porY);
 		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();) 
 		{
 			node_data point=verIter.next();
-
 			StdDraw.setPenColor(Color.BLUE);
 			StdDraw.setPenRadius(0.020);
 			StdDraw.point(point.getLocation().x(),point.getLocation().y());
@@ -723,14 +744,8 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 				for(Iterator<edge_data> edgeIter=g.getE(point.getKey()).iterator();edgeIter.hasNext();) 
 				{
 					edge_data line=edgeIter.next();
-					node_data dest=new nodeData();
+					node_data dest=g.getNode(line.getDest());
 					node_data src=point;
-					for(Iterator<node_data> destIter=g.getV().iterator();destIter.hasNext();) //find dest node
-					{
-						node_data temp=destIter.next();
-						if(temp.getKey()==line.getDest())
-							dest=temp;
-					}
 					StdDraw.setPenColor(Color.RED);
 					StdDraw.setPenRadius(0.005);
 					StdDraw.line(src.getLocation().x(),src.getLocation().y(), dest.getLocation().x(),dest.getLocation().y());
@@ -831,6 +846,20 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		menuItem23.addActionListener(std);
 		menu2.add(menuItem23);
 		
+		JMenu graph = new JMenu("graph");
+		menuBar.add(graph);
+		JMenuItem menuItem31 = new JMenuItem("add vertex");
+		menuItem31.addActionListener(std);
+		graph.add(menuItem31);
+		JMenuItem menuItem32 = new JMenuItem("add edge");
+		menuItem32.addActionListener(std);
+		graph.add(menuItem32);
+		JMenuItem menuItem33 = new JMenuItem("remove vertex");
+		menuItem33.addActionListener(std);
+		graph.add(menuItem33);
+		JMenuItem menuItem34 = new JMenuItem("remove edge");
+		menuItem34.addActionListener(std);
+		graph.add(menuItem34);
 		
 		return menuBar;
 	}
@@ -1819,6 +1848,23 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		{
 			this.window=" TSP ";
 		}
+		if(e.getActionCommand().equals("add vertex")) 
+		{
+			this.window="add vertex";
+		}
+		if(e.getActionCommand().equals("remove vertex")) 
+		{
+			this.window="remove vertex";
+		}
+		if(e.getActionCommand().equals("add edge")) 
+		{
+			this.window="add edge";
+		}
+		if(e.getActionCommand().equals("remove edge")) 
+		{
+			this.window="remove edge";
+		}
+
 	}
 
 
@@ -1973,8 +2019,10 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 				}
 			}
 			
-			if(this.srcForShortestPathDist!=-1&&this.destForShortestPathDist!=-1) {
+			if(this.srcForShortestPathDist!=-1&&this.destForShortestPathDist!=-1) 
+			{
 				this.paintShortestPathDist(this.srcForShortestPathDist,this.destForShortestPathDist);
+				srcForShortestPathDist=-1;destForShortestPathDist=-1;
 			}
 			// this body is intentionally left empty
 		}
@@ -1991,9 +2039,67 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 				this.paintTSP(this.targetsForTSP);
 			}
 		}
-	}
-	
-	
+		if(this.window=="add vertex") 
+		{
+				node_data v=new nodeData(new Point3D(x,y),0,null,0);
+				g.addNode(v);
+				this.paint();
+		}
+		if(this.window=="remove vertex") 
+		{
+				int key=findNode(x,y).getKey();
+				g.removeNode(key);
+				this.paint();
+		}
+		if(this.window=="add edge") {
+			
+			if(this.srcForShortestPathDist==-1) {
+				if(this.findNode(x,y)!=null) {
+					StdDraw.setPenColor(Color.GREEN);
+					StdDraw.setPenRadius(0.015);
+					StdDraw.point(this.findNode(x,y).getLocation().x(), this.findNode(x,y).getLocation().y());
+					this.srcForShortestPathDist=this.findNode(x,y).getKey();
+				}
+			}
+			else if(this.destForShortestPathDist==-1) {
+				if(this.findNode(x,y)!=null) {
+					this.destForShortestPathDist=this.findNode(x,y).getKey();
+				}
+			}
+			
+			if(this.srcForShortestPathDist!=-1&&this.destForShortestPathDist!=-1) 
+			{
+				g.connect(srcForShortestPathDist, destForShortestPathDist, (int)Math.random()*10+1);
+			    this.paint();
+				srcForShortestPathDist=-1;destForShortestPathDist=-1;
+			}
+			// this body is intentionally left empty
+		}
+		if(this.window=="remove edge") {
+			
+			if(this.srcForShortestPathDist==-1) {
+				if(this.findNode(x,y)!=null) {
+					StdDraw.setPenColor(Color.GREEN);
+					StdDraw.setPenRadius(0.015);
+					StdDraw.point(this.findNode(x,y).getLocation().x(), this.findNode(x,y).getLocation().y());
+					this.srcForShortestPathDist=this.findNode(x,y).getKey();
+				}
+			}
+			else if(this.destForShortestPathDist==-1) {
+				if(this.findNode(x,y)!=null) {
+					this.destForShortestPathDist=this.findNode(x,y).getKey();
+				}
+			}
+			
+			if(this.srcForShortestPathDist!=-1&&this.destForShortestPathDist!=-1) 
+			{
+				g.removeEdge(srcForShortestPathDist, destForShortestPathDist);
+			    this.paint();
+				srcForShortestPathDist=-1;destForShortestPathDist=-1;
+			}
+			// this body is intentionally left empty
+		}
+	}	
 
 
 
