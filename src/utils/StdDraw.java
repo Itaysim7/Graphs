@@ -75,6 +75,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import algorithms.Graph_Algo;
@@ -647,7 +648,7 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 	private static graph g;
 	private static Graph_Algo ga=new Graph_Algo();
 	private static double porporY=0;
-
+	private static int count=0;
 	private String window;
 
 	// static initializer
@@ -706,32 +707,40 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 				minY=point.getLocation().y();	
 		} 
 		porporY=(Math.abs(minY)+Math.abs(maxY))/50;
-	}
-	
-	public static void paint() 
-	{		
-		double maxX=Double.NEGATIVE_INFINITY;
-		double maxY=Double.NEGATIVE_INFINITY;
-		double minX=Double.POSITIVE_INFINITY;
-		double minY=Double.POSITIVE_INFINITY;
-
-		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
-		{
-			node_data point=verIter.next();
-			if(point.getLocation().x()>maxX)
-				maxX=point.getLocation().x();
-			if(point.getLocation().y()>maxY)
-				maxY=point.getLocation().y();
-			if(point.getLocation().x()<minX)
-				minX=point.getLocation().x();
-			if(point.getLocation().y()<minY)
-				minY=point.getLocation().y();	
-		} 
 		double porY=(Math.abs(minY)+Math.abs(maxY))/20;
 		double porX=(Math.abs(minX)+Math.abs(maxX))/20;
 		StdDraw.setCanvasSize(600,600);
 		StdDraw.setXscale(minX-porX,maxX+porX);
 		StdDraw.setYscale(minY-porY,maxY+porY);
+	}
+	
+	public static void paint() 
+	{	
+		if(count!=0)
+		{
+			double maxX=Double.NEGATIVE_INFINITY;
+			double maxY=Double.NEGATIVE_INFINITY;
+			double minX=Double.POSITIVE_INFINITY;
+			double minY=Double.POSITIVE_INFINITY;
+			for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();)
+			{
+				node_data point=verIter.next();
+				if(point.getLocation().x()>maxX)
+					maxX=point.getLocation().x();
+				if(point.getLocation().y()>maxY)
+					maxY=point.getLocation().y();
+				if(point.getLocation().x()<minX)
+					minX=point.getLocation().x();
+				if(point.getLocation().y()<minY)
+					minY=point.getLocation().y();	
+			} 
+			double porY=(Math.abs(minY)+Math.abs(maxY))/20;
+			double porX=(Math.abs(minX)+Math.abs(maxX))/20;
+			StdDraw.setCanvasSize(600,600);
+			StdDraw.setXscale(minX-porX,maxX+porX);
+			StdDraw.setYscale(minY-porY,maxY+porY);
+		}
+		count++;
 		for(Iterator<node_data> verIter=g.getV().iterator();verIter.hasNext();) 
 		{
 			node_data point=verIter.next();
@@ -1792,7 +1801,12 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 	 * This method cannot be called directly.
 	 */
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e) 
+	{
+		for(int i=0;i<targetsForTSP.size();i++)
+		{
+			targetsForTSP.remove(0);
+		}
 		if(e.getActionCommand().equals(" Save...   ")) {
 			FileDialog chooser = new FileDialog(StdDraw.frame, "Use a .png or .jpg extension", FileDialog.SAVE);
 			chooser.setVisible(true);
@@ -1830,9 +1844,7 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 				if(point.getLocation().y()<minY)
 					minY=point.getLocation().y();	
 			}
-			
-			StdDraw.setPenColor(Color.BLACK);
-			
+			StdDraw.setPenColor(Color.BLACK);			
 			if(ga.isConnected()) 
 				StdDraw.text((maxX+minX)/2.0,(maxY+minY)/2.0,"YES! the graph is connected");
 			else
@@ -1841,11 +1853,13 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		
 		if(e.getActionCommand().equals(" shortestPathDist ")) 
 		{
+			this.paint();
 			this.window=" shortestPathDist ";
 		}
 		
 		if(e.getActionCommand().equals(" TSP ")) 
 		{
+			this.paint();
 			this.window=" TSP ";
 		}
 		if(e.getActionCommand().equals("add vertex")) 
@@ -1938,35 +1952,55 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 	
 	private void paintShortestPathDist(int src,int dest) 
 	{
-		List<node_data> ver=ga.shortestPath(src, dest);
-		for(int i=0;i<ver.size()-1;i++)
+		try 
 		{
-			StdDraw.setPenColor(Color.PINK);
-			StdDraw.setPenRadius(0.005);
-			StdDraw.line(ver.get(i).getLocation().x(),ver.get(i).getLocation().y(),ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
-			StdDraw.setPenColor(Color.GREEN);
-			StdDraw.setPenRadius(0.015);
-			StdDraw.point(ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
+			List<node_data> ver=ga.shortestPath(src, dest);
+			for(int i=0;i<ver.size()-1;i++)
+			{
+				StdDraw.setPenColor(Color.PINK);
+				StdDraw.setPenRadius(0.005);
+				StdDraw.line(ver.get(i).getLocation().x(),ver.get(i).getLocation().y(),ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
+				StdDraw.setPenColor(Color.GREEN);
+				StdDraw.setPenRadius(0.015);
+				StdDraw.point(ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
+			}	
 		}
+		catch(NullPointerException e)
+		{
+			JOptionPane.showMessageDialog(null,"There is no path");
+		}
+
 	}
 	
 	private void paintTSP(List<Integer> targets) 
 	{
-		List <Integer> t=new ArrayList();
-		for(int i=0;i<targets.size();i++) {//copy for targets because TSP delete the targets. 
-			t.add(targets.get(i));
-		}
-		List<node_data> ver=ga.TSP(t);
-		
-		for(int i=0;i<ver.size()-1;i++)
+		try
 		{
-			StdDraw.setPenColor(Color.PINK);
-			StdDraw.setPenRadius(0.005);
-			StdDraw.line(ver.get(i).getLocation().x(),ver.get(i).getLocation().y(),ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
-			StdDraw.setPenColor(Color.GREEN);
-			StdDraw.setPenRadius(0.015);
-			StdDraw.point(ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
+			if(targets.size()>1)
+			{
+				List <Integer> t=new ArrayList();
+				for(int i=0;i<targets.size();i++) {//copy for targets because TSP delete the targets. 
+					t.add(targets.get(i));
+				}
+				List<node_data> ver=ga.TSP(t);
+				
+				for(int i=0;i<ver.size()-1;i++)
+				{
+					StdDraw.setPenColor(Color.PINK);
+					StdDraw.setPenRadius(0.005);
+					StdDraw.line(ver.get(i).getLocation().x(),ver.get(i).getLocation().y(),ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
+					StdDraw.setPenColor(Color.GREEN);
+					StdDraw.setPenRadius(0.015);
+					StdDraw.point(ver.get(i+1).getLocation().x(),ver.get(i+1).getLocation().y());
+				}
+			}
 		}
+		
+		catch(NullPointerException e)
+		{
+			JOptionPane.showMessageDialog(null,"There is no path,the graph must be connected");
+		}
+
 	}
 
 	
@@ -1975,7 +2009,8 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 	 * This method cannot be called directly.
 	 */
 	@Override
-	public void mouseClicked(MouseEvent arg0) {
+	public void mouseClicked(MouseEvent arg0) 
+	{
 		
 		double maxX=Double.NEGATIVE_INFINITY;
 		double maxY=Double.NEGATIVE_INFINITY;
@@ -2002,7 +2037,6 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		double x=((maxX-minX)/width)*(double)arg0.getX()+minX;
 		double y=((minY-maxY)/height)*(double)arg0.getY()+maxY;
 
-		
 		if(this.window==" shortestPathDist ") {
 			
 			if(this.srcForShortestPathDist==-1) {
@@ -2043,13 +2077,11 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 		{
 				node_data v=new nodeData(new Point3D(x,y),0,null,0);
 				g.addNode(v);
-				this.paint();
 		}
 		if(this.window=="remove vertex") 
 		{
 				int key=findNode(x,y).getKey();
 				g.removeNode(key);
-				this.paint();
 		}
 		if(this.window=="add edge") {
 			
@@ -2070,7 +2102,6 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 			if(this.srcForShortestPathDist!=-1&&this.destForShortestPathDist!=-1) 
 			{
 				g.connect(srcForShortestPathDist, destForShortestPathDist, (int)Math.random()*10+1);
-			    this.paint();
 				srcForShortestPathDist=-1;destForShortestPathDist=-1;
 			}
 			// this body is intentionally left empty
@@ -2094,7 +2125,6 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 			if(this.srcForShortestPathDist!=-1&&this.destForShortestPathDist!=-1) 
 			{
 				g.removeEdge(srcForShortestPathDist, destForShortestPathDist);
-			    this.paint();
 				srcForShortestPathDist=-1;destForShortestPathDist=-1;
 			}
 			// this body is intentionally left empty
