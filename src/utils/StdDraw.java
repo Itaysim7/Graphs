@@ -2101,7 +2101,7 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 			
 			if(this.srcForShortestPathDist!=-1&&this.destForShortestPathDist!=-1) 
 			{
-				g.connect(srcForShortestPathDist, destForShortestPathDist, (int)Math.random()*10+1);
+				g.connect(srcForShortestPathDist, destForShortestPathDist, ((int)(Math.random()*10))+1);
 				srcForShortestPathDist=-1;destForShortestPathDist=-1;
 			}
 			// this body is intentionally left empty
